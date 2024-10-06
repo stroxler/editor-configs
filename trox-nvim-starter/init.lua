@@ -520,6 +520,22 @@ vim.api.nvim_create_autocmd('LspAttach', {
 ---
 
 local lspconfig = require('lspconfig')
+
+-- Add a minipyre language server
+--   This assumes I've symlinked minipyre to somewhere on my PATH and will
+--   only currently work in our repo (where minipyre hardcodes how to find
+--   typeshed).
+local lspconfig_configs = require 'lspconfig.configs'
+if not lspconfig_configs.minipyre then
+	lspconfig_configs.minipyre = {
+		default_config = {
+ 		 cmd = { '_minipyre_', 'lsp' },
+		 filetypes = { 'python' },
+		 root_dir = function() return vim.fn.getcwd() end;
+		}
+	}
+end
+
 local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 vim.lsp.handlers["textDocument/diagnostic"] = vim.lsp.with(
@@ -547,5 +563,6 @@ if vim.g.lsp_setup_ready == nil then
 
   -- See :help lspconfig-setup
   lspconfig.ocamllsp.setup({capabilities = lsp_capabilities,})
+  lspconfig.minipyre.setup({capabilities = lsp_capabilities,})
 end
 
