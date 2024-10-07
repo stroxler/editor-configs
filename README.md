@@ -17,3 +17,21 @@ need to remember how things work as well as some bigger "starter-kit" based conf
 
 - `trox-nvim-starter`: My fork of the excelent `nvim-starter` repo: a very simple config
   but with basic LSP support wired up. This is a minimal usable config for ocaml.
+
+## What do I hope to add?
+
+- An nvim config based on zmre's nix-based vim starter
+- A chemacs setup with several emacs configs:
+  - An emacs-from-scratch config, probably following SystemCrafters again
+  - Almost certainly a doom-emacs setup
+  - Find someone who's done emacs via nix and see if I can make that work
+
+## What is not here?
+
+- My basic .vimrc I use to have a minimally usable editor on foreign machines.
+  I should probably write it down somewhere eventually.
+- Other people's configs I've cloned verbatim:
+  - I cloned `zmre`'s `pwnvim` into `~/devtool-flakes/pwnvim/` on one of my machines and
+    ran `nix build`. As a result, I can use that setup by just running
+    `~/devtool-flakes/pwnvim/result/bin/nvim flake.nix` which has been awesome for nix
+    work since that setup has the nix LSP configured very well!
