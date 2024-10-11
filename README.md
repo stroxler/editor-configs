@@ -28,10 +28,23 @@ need to remember how things work as well as some bigger "starter-kit" based conf
 
 ## What is not here?
 
-- My basic .vimrc I use to have a minimally usable editor on foreign machines.
-  I should probably write it down somewhere eventually.
-- Other people's configs I've cloned verbatim:
-  - I cloned `zmre`'s `pwnvim` into `~/devtool-flakes/pwnvim/` on one of my machines and
-    ran `nix build`. As a result, I can use that setup by just running
-    `~/devtool-flakes/pwnvim/result/bin/nvim flake.nix` which has been awesome for nix
-    work since that setup has the nix LSP configured very well!
+### Basic .vimrc
+
+My basic .vimrc I use to have a minimally usable editor on foreign machines.
+I should probably write it down somewhere eventually.
+
+### `pwnvim`
+
+I cloned `zmre`'s `pwnvim` into `~/devtool-flakes/pwnvim/` with this snippet:
+```
+mkdir -p ~/devtool-flakes
+git clone git@github.com:zmre/pwnvim.git ~/devtool-flakes/pwnvim
+pushd ~/devtool-flakes/pwnvim
+  nix build .
+popd
+```
+which allows me to edit files using that config easily. I currently am using this
+as my editor for nix files because the nix lsp config here is very good, e.g.
+```
+~/devtool-flakes/pwnvim/result/bin/nvim flake.nix
+```
