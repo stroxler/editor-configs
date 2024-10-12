@@ -31,7 +31,11 @@ need to remember how things work as well as some bigger "starter-kit" based conf
 ### Basic .vimrc
 
 My basic .vimrc I use to have a minimally usable editor on foreign machines.
-I should probably write it down somewhere eventually.
+
+I have a copy of it in my `ape-nix` repo because I consider it part of a minimal
+setup (whereas for now I treat my editor configs separately, since I don't really
+feel like I have a stable setup right now.
+
 
 ### `pwnvim`
 
