@@ -134,6 +134,7 @@ lazy.setup({
   }
 })
 
+vim.env.CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION = "false"
 local env_agent = os.getenv("NVIM_AGENT_COMMAND")
 agent_command = env_agent or "claude"
 
