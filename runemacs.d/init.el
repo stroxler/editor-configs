@@ -27,9 +27,16 @@
 ;; Initialize package sources
 (require 'package)
 
+;; Corporate DNS can't resolve external hosts; use fwdproxy so the
+;; proxy handles DNS resolution for us.
+(when (or (getenv "https_proxy") (getenv "HTTPS_PROXY"))
+  (require 'url)
+  (setq url-proxy-services
+        `(("http"  . ,(replace-regexp-in-string "^https?://" "" (or (getenv "http_proxy") (getenv "HTTP_PROXY") "")))
+          ("https" . ,(replace-regexp-in-string "^https?://" "" (or (getenv "https_proxy") (getenv "HTTPS_PROXY") "")))
+          ("no_proxy" . "^\\(localhost\\|127\\.0\\.0\\.1\\)"))))
+
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-			 ("gnu" . "http://elpa.gnu.org/packages/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (package-initialize)
@@ -159,21 +166,23 @@
   :config
   (evil-collection-init))
 
-;; ** Hydra **
-;;
-;; Tool for making interactive commands. We define a little text-scaling tool
-;; just to illustrate how it works
-;;
-(use-package hydra)
-
-(defhydra hydra-text-scale (:timeout 4)
-  "scale text"
-  ("j" text-scale-increase "in")
-  ("k" text-scale-decrease "out")
-  ("f" nil "finished" :exit t))
-
-(rune/leader-keys
-  "ts" '(hydra-text-scale/body :which-key "scale text"))
+;; ;; ** Hydra **
+;; ;;
+;; ;; Tool for making interactive commands. We define a little text-scaling tool
+;; ;; just to illustrate how it works
+;; ;;
+;; ;; NOTE: Commented this out because the download seemed to fail on 2026-03-23
+;; ;;
+;; (use-package hydra)
+;; 
+;; (defhydra hydra-text-scale (:timeout 4)
+;;   "scale text"
+;;   ("j" text-scale-increase "in")
+;;   ("k" text-scale-decrease "out")
+;;   ("f" nil "finished" :exit t))
+;; 
+;; (rune/leader-keys
+;;   "ts" '(hydra-text-scale/body :which-key "scale text"))
 
 ;;
 ;; languages setup
