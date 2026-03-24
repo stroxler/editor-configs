@@ -4,37 +4,18 @@ This is my repo for collecting alternative vim and emacs editor configurations.
 
 ## Why a collection of configurations?
 
-I struggle a bit with editor configs. Since I began working at Meta, I use our
-internal VSCode for most of my daily work, so I've gotten out of practice dealing with
-vim and emacs. And the vim / emacs world has changed significantly with the widespread
-adoption of LSP, so my older configs are not really sensible anymore.
+I've historically struggled a bit with editor configs. They take work to maintain
+and rot over time, plus since working at Meta I'm often boxed into useing the
 
-Given this state of affairs, I want to make it easy to switch between configs, and in
-particular have some very simple configs that are easy for me to read in one go when I
-need to remember how things work as well as some bigger "starter-kit" based configs.
 
-## What is here?
+## What about my editor config *isn't* here
 
-- `trox-nvim-starter`: My fork of the excelent `nvim-starter` repo: a very simple config
-  but with basic LSP support wired up. This is a minimal usable config for ocaml.
 
-## What do I hope to add?
+### Basic `.vimrc`
 
-- An nvim config based on zmre's nix-based vim starter
-- A chemacs setup with several emacs configs:
-  - An emacs-from-scratch config, probably following SystemCrafters again
-  - Almost certainly a doom-emacs setup
-  - Find someone who's done emacs via nix and see if I can make that work
-
-## What is not here?
-
-### Basic .vimrc
-
-My basic .vimrc I use to have a minimally usable editor on foreign machines.
-
-I have a copy of it in my `ape-nix` repo because I consider it part of a minimal
-setup (whereas for now I treat my editor configs separately, since I don't really
-feel like I have a stable setup right now.
+I have a copy of a basic `.vimrc` suitable for machines that only have the
+original `vim` (although neovim can use it too) in my `ape-nix` repo, becasue
+I consider it part of a bare minumum setup.
 
 
 ### `pwnvim`
@@ -52,3 +33,57 @@ as my editor for nix files because the nix lsp config here is very good, e.g.
 ```
 ~/devtool-flakes/pwnvim/result/bin/nvim flake.nix
 ```
+
+### `chemacs2`
+
+I use a multi-config emacs as follows:
+```
+# Make chemacs2 the "true" emacs config
+git clone git@github.com:plexus/chemacs2.git ~/.config/emacs
+
+# Point emacs by default at the runemacs in this repo (assumed to live at ~/kode/editor-configs)
+echo '
+(("default" . ((user-emacs-directory . "~/kode/editor-configs/runemacs.d"))))
+' > ~/.emacs-profiles.d
+```
+
+## What is here?
+
+### The `older` directory
+
+This contains some configs I consider stale - many of them won't work properly,
+for example `trox-nvim-starter` doesn't work on a fresh install with no lazy.lock
+because `nvim-treesitter` made breaking internal changes - but might be useful
+to reference back to going forward.
+
+I expect this directory to grow over time, because emacs and vim are both prone
+to needing periodic "config resets" and it's useful to have the older configs
+to refer back to.
+
+### `runemacs`
+
+This is my emacs config from following along with the System Crafter's
+"emacs from scratch" series from 2020, or sometime around then. It's a pretty
+basic emacs setup, but has all the minimal features a good editor should have.
+
+### `nvim-a`
+
+This is my first stab in 2026-03 at a simple agent-oriented neovim. I started off
+using something very close to `older/trox-nvim-starter`, but had to fix multiple
+issues
+
+As of writing (in 2026-03) this is both in a working state and also both not well
+organized and not well thought-out in terms of ergonomics.
+
+But what it has is a pretty basic neovim - which could easily be extended - and
+simple agent integration using the `claude-code` plugin, which is centered around
+CLI interaction (and therefore works not only with `claude` but also with `codex`
+and other CLI agents).
+
+## What do I hope to add?
+
+- An nvim config based on zmre's nix-based vim starter
+- A chemacs setup with several emacs configs:
+  - An emacs-from-scratch config, probably following SystemCrafters again
+  - Almost certainly a doom-emacs setup
+  - Find someone who's done emacs via nix and see if I can make that work
