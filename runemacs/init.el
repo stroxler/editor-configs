@@ -37,7 +37,8 @@
           ("no_proxy" . "^\\(localhost\\|127\\.0\\.0\\.1\\)"))))
 
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
+                         ("elpa" . "https://elpa.gnu.org/packages/")
+			 ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
 
 (package-initialize)
 (unless package-archive-contents
@@ -166,23 +167,21 @@
   :config
   (evil-collection-init))
 
-;; ;; ** Hydra **
-;; ;;
-;; ;; Tool for making interactive commands. We define a little text-scaling tool
-;; ;; just to illustrate how it works
-;; ;;
-;; ;; NOTE: Commented this out because the download seemed to fail on 2026-03-23
-;; ;;
-;; (use-package hydra)
-;; 
-;; (defhydra hydra-text-scale (:timeout 4)
-;;   "scale text"
-;;   ("j" text-scale-increase "in")
-;;   ("k" text-scale-decrease "out")
-;;   ("f" nil "finished" :exit t))
-;; 
-;; (rune/leader-keys
-;;   "ts" '(hydra-text-scale/body :which-key "scale text"))
+;; ** Hydra **
+;;
+;; Tool for making interactive commands. We define a little text-scaling tool
+;; just to illustrate how it works
+;;
+(use-package hydra)
+
+(defhydra hydra-text-scale (:timeout 4)
+  "scale text"
+  ("j" text-scale-increase "in")
+  ("k" text-scale-decrease "out")
+  ("f" nil "finished" :exit t))
+
+(rune/leader-keys
+  "ts" '(hydra-text-scale/body :which-key "scale text"))
 
 ;;
 ;; languages setup
@@ -198,8 +197,35 @@
   (add-to-list 'eglot-server-programs
     `((python-ts-mode python-mode) . ("pyrefly" "lsp"))))
 
-
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+
+;;
+;; general agent integration
+;;
+
+;; auto suggestions are terrible for editor integrations
+;; - this will disable claude code
+;; - for codex, there's a setting to do it in config.toml
+(setenv "CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION" "false")
+
+(use-package vterm
+  :ensure t
+  :init
+  (setq vterm-module-cmake-args
+        (concat "-DCMAKE_BUILD_RPATH="
+                (expand-file-name "~/.nix-profile/lib"))))
+
+(use-package ai-code
+  :config
+  (ai-code-set-backend 'claude-code)
+  ;; Optional: use a narrower transient menu on smaller frames
+  ;; (setq ai-code-menu-layout 'two-columns)
+  (global-set-key (kbd "C-c a") #'ai-code-menu)
+  ;; Stay in the current buffer after sending a prompt
+  (advice-add 'ai-code--send-prompt :override
+    (lambda (full-prompt)
+      (ai-code-cli-send-command full-prompt)
+      (message "Prompt sent to AI."))))
 
 ;; =============== END ===================
 (custom-set-variables
@@ -207,7 +233,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
+ '(package-selected-packages nil)
+ '(package-vc-selected-packages
+   '((claude-code-ide :url
+		      "https://github.com/manzaltu/claude-code-ide.el"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
