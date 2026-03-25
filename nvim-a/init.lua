@@ -197,7 +197,7 @@ require("claude-code").setup({
         verbose = "<leader>cV",  -- Normal mode keymap for Claude Code with verbose flag
       },
     },
-    window_navigation = true, -- Enable window navigation keymaps (<C-h/j/k/l>)
+    window_navigation = false, -- Disable C-h/j/k/l (conflicts with terminal readline)
     scrolling = true,         -- Enable scrolling keymaps (<C-f/b>) for page up/down
   }
 })
@@ -212,6 +212,16 @@ vim.cmd.colorscheme('tokyonight')
 
 ---- Space as leader key ----
 vim.g.mapleader = ' '
+
+---- Window navigation with C-w + arrow keys ----
+vim.keymap.set('n', '<C-w><Up>', '<C-w>k', { desc = 'Move to window above' })
+vim.keymap.set('n', '<C-w><Down>', '<C-w>j', { desc = 'Move to window below' })
+vim.keymap.set('n', '<C-w><Left>', '<C-w>h', { desc = 'Move to window left' })
+vim.keymap.set('n', '<C-w><Right>', '<C-w>l', { desc = 'Move to window right' })
+vim.keymap.set('t', '<C-w><Up>', '<C-\\><C-n><C-w>k', { desc = 'Move to window above (terminal)' })
+vim.keymap.set('t', '<C-w><Down>', '<C-\\><C-n><C-w>j', { desc = 'Move to window below (terminal)' })
+vim.keymap.set('t', '<C-w><Left>', '<C-\\><C-n><C-w>h', { desc = 'Move to window left (terminal)' })
+vim.keymap.set('t', '<C-w><Right>', '<C-\\><C-n><C-w>l', { desc = 'Move to window right (terminal)' })
 
 ---- Commands ----
 vim.keymap.set('n', '<leader>w', '<cmd>write<cr>')
@@ -238,6 +248,26 @@ local function find_claude_code_buffer()
     end
   end
   return nil
+end
+
+-- Find the window displaying a given buffer, if any
+local function find_window_for_buf(bufnr)
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_buf(win) == bufnr then
+      return win
+    end
+  end
+  return nil
+end
+
+-- Scroll the Claude Code window to the bottom without changing focus
+local function scroll_claude_code_to_bottom()
+  local bufnr = find_claude_code_buffer()
+  if not bufnr then return end
+  local win = find_window_for_buf(bufnr)
+  if not win then return end
+  local line_count = vim.api.nvim_buf_line_count(bufnr)
+  vim.api.nvim_win_set_cursor(win, { line_count, 0 })
 end
 
 -- Send text to the Claude Code terminal
@@ -285,6 +315,18 @@ local function send_file_path()
   send_to_claude_code('File: `' .. vim.fn.expand('%:p') .. '`\n')
 end
 
+-- Send a prompt to Claude Code without switching focus
+local function send_prompt_to_claude()
+  vim.ui.input({ prompt = 'Claude: ' }, function(input)
+    if input and input ~= '' then
+      send_to_claude_code(input .. '\r')
+      -- Scroll to bottom so the response is visible
+      vim.defer_fn(scroll_claude_code_to_bottom, 200)
+      vim.notify('Prompt sent to Claude Code.', vim.log.levels.INFO)
+    end
+  end)
+end
+
 -- Commands
 vim.api.nvim_create_user_command('ClaudeSend', function()
   send_selection_with_context()
@@ -294,9 +336,19 @@ vim.api.nvim_create_user_command('ClaudeSendFile', function()
   send_file_path()
 end, {})
 
+vim.api.nvim_create_user_command('ClaudePrompt', function()
+  send_prompt_to_claude()
+end, {})
+
+vim.api.nvim_create_user_command('ClaudeScroll', function()
+  scroll_claude_code_to_bottom()
+end, {})
+
 -- Keybindings (leader + c prefix)
 vim.keymap.set('v', '<leader>cs', '<cmd>ClaudeSend<cr>', { desc = 'Send selection to Claude Code' })
 vim.keymap.set('n', '<leader>cf', '<cmd>ClaudeSendFile<cr>', { desc = 'Send file path to Claude Code' })
+vim.keymap.set('n', '<leader>cp', '<cmd>ClaudePrompt<cr>', { desc = 'Send prompt to Claude Code (stay in buffer)' })
+vim.keymap.set('n', '<leader>cj', '<cmd>ClaudeScroll<cr>', { desc = 'Scroll Claude Code to bottom' })
 
 
 -- Multi-line insert in Visual Line mode with 'I' and 'A'
