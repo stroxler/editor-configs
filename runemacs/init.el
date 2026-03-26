@@ -61,7 +61,8 @@
                 eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-(use-package command-log-mode)
+(use-package command-log-mode
+  :defer t)
 
 (use-package ivy
   :diminish
@@ -87,7 +88,8 @@
 ;;
 ;; M-x all-the-icons-install-fonts
 
-(use-package all-the-icons)
+(use-package all-the-icons
+  :defer t)
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
@@ -188,7 +190,8 @@
 ;;
 
 
-(use-package rustic)
+(use-package rustic
+  :defer t)
 
 (use-package eglot
   :ensure t
@@ -210,22 +213,23 @@
 
 (use-package vterm
   :ensure t
+  :defer t
   :init
   (setq vterm-module-cmake-args
         (concat "-DCMAKE_BUILD_RPATH="
                 (expand-file-name "~/.nix-profile/lib"))))
 
 (use-package ai-code
+  :bind (("C-c a" . ai-code-menu))
   :config
   (ai-code-set-backend 'claude-code)
-  ;; Optional: use a narrower transient menu on smaller frames
-  ;; (setq ai-code-menu-layout 'two-columns)
-  (global-set-key (kbd "C-c a") #'ai-code-menu)
   ;; Stay in the current buffer after sending a prompt
   (advice-add 'ai-code--send-prompt :override
     (lambda (full-prompt)
       (ai-code-cli-send-command full-prompt)
       (message "Prompt sent to AI."))))
+(rune/leader-keys
+  "d" '(ai-code-menu :which-key "ai-code menu"))
 
 ;; =============== END ===================
 (custom-set-variables
