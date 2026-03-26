@@ -3,7 +3,6 @@
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
 
-
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
 ;; (setq user-full-name "John Doe"
@@ -32,7 +31,7 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-zenburn)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -73,3 +72,54 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+
+(setenv "CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION" "false")
+
+(setq vterm-module-cmake-args
+      (concat "-DCMAKE_BUILD_RPATH="
+              (expand-file-name "~/.nix-profile/lib")))
+
+(use-package! ai-code
+  :config
+  (ai-code-set-backend 'claude-code)
+  (map! "C-c a" #'ai-code-menu)
+  (advice-add 'ai-code--send-prompt :override
+    (lambda (full-prompt)
+      (ai-code-cli-send-command full-prompt)
+      ;; Force vterm redraw after a short delay to prevent garbled display
+      (run-with-timer 1.0 nil
+        (lambda ()
+          (dolist (buf (buffer-list))
+            (with-current-buffer buf
+              (when (derived-mode-p 'vterm-mode)
+                (vterm--invalidate))))))
+      (message "Prompt sent to AI."))))
+
+(map! :leader
+      :desc "ai-code menu"
+      "d" #'ai-code-menu)
+
+;; Make M-m enter doom menue in insert mode (mimicking non-evil doom behavior)
+(setq doom-leader-alt-key "M-m")
+(map! :i "M-m" (general-simulate-key "SPC"))
+(map! :n "M-m" (general-simulate-key "SPC"))
+
+;; Remap SPC SPC to ai-code-send-command
+(map! :leader :desc "Send command to ai" "SPC" #'ai-code-send-command)
+
+(use-package! evil-terminal-cursor-changer
+  :config
+  (evil-terminal-cursor-changer-activate) ; Enable the package
+  (setq evil-visual-state-cursor 'box)    ; Customization
+  (setq evil-insert-state-cursor 'bar)
+  (setq evil-emacs-state-cursor  'hbar))
+
+;; Move private config bindings from SPC f {p,P} to SPC f {m,M}
+;; and repurpose SPC f p for projectile-find-file
+(map! :leader
+      (:prefix "f"
+       :desc "Find file in private config" "m" #'doom/find-file-in-private-config
+       :desc "Browse private config"       "M" #'doom/open-private-config
+       :desc "Projectile find file"        "p" #'projectile-find-file
+       :desc "Fuzzy find file"            "z" #'consult-find
+       "P" nil))
