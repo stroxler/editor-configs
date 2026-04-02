@@ -54,10 +54,14 @@ ensure_symlink "$REPO_DIR/chemacs2-profiles.el" "$HOME/.emacs-profiles.el"
 # Each variant gets its own copy so that its .local package cache is independent.
 DOOM_BASE="$HOME/.config/doomemacs"
 if [ -d "$DOOM_BASE" ]; then
-    echo "doomemacs base already installed at $DOOM_BASE"
+    echo "doomemacs base already cloned at $DOOM_BASE"
 else
     echo "Cloning doomemacs into $DOOM_BASE"
     git clone --depth 1 https://github.com/doomemacs/doomemacs "$DOOM_BASE"
+fi
+if [ -d "$DOOM_BASE/.local" ]; then
+    echo "doomemacs base already installed"
+else
     echo "Running doom install for base packages..."
     "$DOOM_BASE/bin/doom" install
 fi
@@ -72,6 +76,10 @@ ensure_doom_variant() {
     else
         echo "Copying doomemacs base to $variant_dir"
         cp -R "$DOOM_BASE" "$variant_dir"
+    fi
+    if [ -d "$variant_dir/.local" ]; then
+        echo "doomemacs-$name already synced"
+    else
         echo "Running doom sync for doom-$name..."
         DOOMDIR="$HOME/.config/doom-$name" "$variant_dir/bin/doom" sync --rebuild
     fi
