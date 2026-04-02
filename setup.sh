@@ -89,5 +89,6 @@ ensure_doom_variant "a"
 
 # Editor config symlinks into ~/.config/
 ensure_symlink "$REPO_DIR/nvim-a" "$HOME/.config/nvim-a"
+ensure_symlink "$REPO_DIR/nvim-b" "$HOME/.config/nvim-b"
 ensure_symlink "$REPO_DIR/doom-a" "$HOME/.config/doom-a"
 ensure_symlink "$REPO_DIR/runemacs" "$HOME/.config/runemacs"
