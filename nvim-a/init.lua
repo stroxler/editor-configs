@@ -135,7 +135,7 @@ lazy.setup({
 })
 
 vim.env.CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION = "false"
-local env_agent = os.getenv("NVIM_AGENT_COMMAND")
+local env_agent = os.getenv("AGENT_COMMAND")
 agent_command = env_agent or "claude"
 
 
@@ -223,10 +223,32 @@ vim.keymap.set('t', '<C-w><Down>', '<C-\\><C-n><C-w>j', { desc = 'Move to window
 vim.keymap.set('t', '<C-w><Left>', '<C-\\><C-n><C-w>h', { desc = 'Move to window left (terminal)' })
 vim.keymap.set('t', '<C-w><Right>', '<C-\\><C-n><C-w>l', { desc = 'Move to window right (terminal)' })
 
----- Commands ----
-vim.keymap.set('n', '<leader>w', '<cmd>write<cr>')
-vim.keymap.set('n', '<leader>bq', '<cmd>bdelete<cr>')
-vim.keymap.set('n', '<leader>bl', '<cmd>buffer #<cr>')
+---- M-SPC and C-SPC as leader in insert and terminal modes ----
+---- C-M remapped to set-mark (since C-SPC is taken) ----
+local function leader_from_mode()
+  local esc = vim.api.nvim_replace_termcodes('<C-\\><C-n>', true, false, true)
+  vim.api.nvim_feedkeys(esc, 'n', false)
+  local space = vim.api.nvim_replace_termcodes('<Space>', true, false, true)
+  vim.api.nvim_feedkeys(space, 'm', false)
+end
+vim.keymap.set('i', '<M-Space>', leader_from_mode, { desc = 'Leader from insert mode' })
+vim.keymap.set('t', '<M-Space>', leader_from_mode, { desc = 'Leader from terminal mode' })
+vim.keymap.set('i', '<C-Space>', leader_from_mode, { desc = 'Leader from insert mode' })
+vim.keymap.set('t', '<C-Space>', leader_from_mode, { desc = 'Leader from terminal mode' })
+vim.keymap.set('n', '<C-Space>', '<Space>', { remap = true, desc = 'Leader from normal mode' })
+
+---- Windows (SPC w) ----
+vim.keymap.set('n', '<leader>w', '<C-w>', { desc = 'Window prefix (like doom SPC w)' })
+vim.keymap.set('n', '<leader>wd', '<cmd>close<cr>', { desc = 'Delete window' })
+vim.keymap.set('n', '<leader>wo', '<cmd>only<cr>', { desc = 'Close other windows' })
+
+---- Buffers (SPC b) ----
+vim.keymap.set('n', '<leader>bb', '<cmd>buffers<cr>:b ', { desc = 'Switch buffer' })
+vim.keymap.set('n', '<leader>bk', '<cmd>bdelete<cr>', { desc = 'Kill buffer' })
+vim.keymap.set('n', '<leader>bl', '<cmd>buffer #<cr>', { desc = 'Switch to last buffer' })
+vim.keymap.set('n', '<leader>bn', '<cmd>bnext<cr>', { desc = 'Next buffer' })
+vim.keymap.set('n', '<leader>bp', '<cmd>bprevious<cr>', { desc = 'Previous buffer' })
+vim.keymap.set('n', '<leader>bs', '<cmd>write<cr>', { desc = 'Save buffer' })
 
 
 
@@ -344,11 +366,12 @@ vim.api.nvim_create_user_command('ClaudeScroll', function()
   scroll_claude_code_to_bottom()
 end, {})
 
--- Keybindings (leader + c prefix)
-vim.keymap.set('v', '<leader>cs', '<cmd>ClaudeSend<cr>', { desc = 'Send selection to Claude Code' })
-vim.keymap.set('n', '<leader>cf', '<cmd>ClaudeSendFile<cr>', { desc = 'Send file path to Claude Code' })
-vim.keymap.set('n', '<leader>cp', '<cmd>ClaudePrompt<cr>', { desc = 'Send prompt to Claude Code (stay in buffer)' })
-vim.keymap.set('n', '<leader>cj', '<cmd>ClaudeScroll<cr>', { desc = 'Scroll Claude Code to bottom' })
+-- Keybindings (leader + d prefix, matching doom SPC d for AI)
+vim.keymap.set('n', '<leader>d', '<cmd>ClaudeCode<cr>', { desc = 'Toggle Claude Code' })
+vim.keymap.set('v', '<leader>ds', '<cmd>ClaudeSend<cr>', { desc = 'Send selection to Claude Code' })
+vim.keymap.set('n', '<leader>df', '<cmd>ClaudeSendFile<cr>', { desc = 'Send file path to Claude Code' })
+vim.keymap.set('n', '<leader>dp', '<cmd>ClaudePrompt<cr>', { desc = 'Send prompt to Claude Code (stay in buffer)' })
+vim.keymap.set('n', '<leader>dj', '<cmd>ClaudeScroll<cr>', { desc = 'Scroll Claude Code to bottom' })
 
 
 -- Multi-line insert in Visual Line mode with 'I' and 'A'
