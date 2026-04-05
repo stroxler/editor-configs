@@ -79,9 +79,22 @@
       (concat "-DCMAKE_BUILD_RPATH="
               (expand-file-name "~/.nix-profile/lib")))
 
+(defun my/set-agent-command (command-string)
+  "Set the ai-code agent command from COMMAND-STRING.
+Format: \"program --flag1 --flag2\" (first token is the binary, rest are switches)."
+  (interactive "sAgent command: ")
+  (let* ((parts (split-string command-string))
+         (program (car parts))
+         (switches (cdr parts)))
+    (setq ai-code-claude-code-program program
+          ai-code-claude-code-program-switches switches)
+    (message "Agent command set to: %s" command-string)))
+
 (use-package! ai-code
   :config
   (ai-code-set-backend 'claude-code)
+  (when-let ((agent-cmd (getenv "AGENT_COMMAND")))
+    (my/set-agent-command agent-cmd))
   (map! "C-c a" #'ai-code-menu)
   (advice-add 'ai-code--send-prompt :override
     (lambda (full-prompt)
@@ -99,10 +112,28 @@
       :desc "ai-code menu"
       "d" #'ai-code-menu)
 
-;; Make M-m enter doom menue in insert mode (mimicking non-evil doom behavior)
+;; Make M-m, M-SPC, and C-SPC act as doom leader in all modes
+;; Remap set-mark (normally C-SPC) to C-M
 (setq doom-leader-alt-key "M-m")
-(map! :i "M-m" (general-simulate-key "SPC"))
-(map! :n "M-m" (general-simulate-key "SPC"))
+(map! :nvig "M-m" doom-leader-map)
+(map! :nvig "M-SPC" doom-leader-map)
+;; Bind both C-@ and C-SPC: terminals send C-@ for Ctrl-Space,
+;; but GUI Emacs sees C-SPC as a distinct key.
+(map! :nvig "C-@" doom-leader-map)
+(map! :nvig "C-SPC" doom-leader-map)
+(map! :nvig "C-M" #'set-mark-command)
+
+;; Make C-w trigger window actions in insert mode and vterm
+(map! :i "C-w" evil-window-map)
+(after! evil-collection-vterm
+  (evil-define-key 'insert vterm-mode-map (kbd "C-w") evil-window-map))
+
+;; Make M-SPC and C-SPC act as doom leader in vterm insert mode
+(after! evil-collection-vterm
+  (evil-define-key 'insert vterm-mode-map (kbd "M-SPC") doom-leader-map)
+  ;; Same C-@ / C-SPC dual binding for vterm (see comment above)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-@") doom-leader-map)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-SPC") doom-leader-map))
 
 ;; Remap SPC SPC to ai-code-send-command
 (map! :leader :desc "Send command to ai" "SPC" #'ai-code-send-command)
