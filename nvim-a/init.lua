@@ -71,6 +71,18 @@ lazy.setup({
   {'folke/tokyonight.nvim'},
   ---- Utilities ----
   {'nvim-lua/plenary.nvim'},
+  {
+    'folke/which-key.nvim',
+    event = 'VeryLazy',
+    opts = {
+      spec = {
+        { '<leader>b', group = 'buffer' },
+        { '<leader>c', group = 'claude (continue/verbose)' },
+        { '<leader>d', group = 'claude code' },
+        { '<leader>w', group = 'window' },
+      },
+    },
+  },
   ---- Code manipulation ----
   {'numToStr/Comment.nvim'},
   {'wellle/targets.vim'},
