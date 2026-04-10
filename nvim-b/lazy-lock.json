@@ -1,0 +1,13 @@
+{
+  "apprentice": { "branch": "master", "commit": "59ad13661fa15edaf72c62218903c7817b5a3691" },
+  "everforest": { "branch": "master", "commit": "e6e3cbdc854dcd75a2f1a9648ab21103acb79c44" },
+  "gruvbox": { "branch": "master", "commit": "bf2885a95efdad7bd5e4794dd0213917770d79b7" },
+  "lazy.nvim": { "branch": "main", "commit": "51a3873ccd59239e4dff3319561d51031f4b52d2" },
+  "noctis.nvim": { "branch": "main", "commit": "6a0c8d18e1f983ac8a179f7b9055db046eaedef0" },
+  "stellarized": { "branch": "master", "commit": "2899a2c29b6f1361fcc82a38cf6616fad74c77e2" },
+  "stllrzd": { "branch": "master", "commit": "6d46b3473964e598f572e8dc997eb078f91ac998" },
+  "tokyonight.nvim": { "branch": "main", "commit": "df13e3268a44f142999fa166572fe95a650a0b37" },
+  "vim": { "branch": "main", "commit": "f13f5dfbb784deddbc1d8195f34dfd9ec73e2295" },
+  "vim-solarized8": { "branch": "master", "commit": "b0b5d4dd1e582cd5f681bb438346ce5848d845fd" },
+  "zenburn.nvim": { "branch": "master", "commit": "f5ee12b30119499c7fa7f95719cd7c5aab9f9f29" }
+}
